@@ -72,15 +72,20 @@ class LiteI2CPHYCore(LiteXModule):
         nack = Signal()
 
         # SDA
-        self.sda_o = sda_o  = Signal()
-        self.sda_i = sda_i  = Signal()
-        self.sda_oe = sda_oe = Signal()
-        self.specials += SDRTristate(
-            io = pads.sda,
-            o  = Constant(0),       # I2C uses Pull-ups, only drive low.
-            oe = sda_oe & ~sda_o,   # Drive when oe and sda is low.
-            i  = sda_i,
-        )
+        if hasattr(pads, "sda_oe"):
+            self.sda_o = sda_o = pads.sda_o
+            self.sda_i = sda_i = pads.sda_i
+            self.sda_oe = sda_oe = pads.sda_oe
+        else:
+            self.sda_o = sda_o  = Signal()
+            self.sda_i = sda_i  = Signal()
+            self.sda_oe = sda_oe = Signal()
+            self.specials += SDRTristate(
+                io = pads.sda,
+                o  = Constant(0),       # I2C uses Pull-ups, only drive low.
+                oe = sda_oe & ~sda_o,   # Drive when oe and sda is low.
+                i  = sda_i,
+            )
 
         bytes_send = Signal(3)
         bytes_recv = Signal(3)
