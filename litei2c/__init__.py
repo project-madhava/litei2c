@@ -63,7 +63,7 @@ class LiteI2C(LiteXModule):
 
         self.crossbar = crossbar = LiteI2CCrossbar(clock_domain)
 
-        self.comb += phy.active.eq(crossbar.active)
+        crossbar.comb += phy.active.eq(crossbar.active)
 
         if with_master:
             self.master = master = LiteI2CMaster(
@@ -71,7 +71,7 @@ class LiteI2C(LiteXModule):
                 rx_fifo_depth = i2c_master_rx_fifo_depth,
                 with_irq = with_irq)
             port_master = crossbar.get_port(master.active)
-            self.comb += [
+            master.comb += [
                 port_master.source.connect(master.sink),
                 master.source.connect(port_master.sink),
             ]
@@ -79,12 +79,12 @@ class LiteI2C(LiteXModule):
                 self.ev = master.ev
 
         if clock_domain != "sys":
-            self.comb += [
+            crossbar.comb += [
                 crossbar.tx_cdc.source.connect(phy.sink),
                 phy.source.connect(crossbar.rx_cdc.sink),
             ]
         else:
-            self.comb += [
+            crossbar.comb += [
                 crossbar.master.source.connect(phy.sink),
                 phy.source.connect(crossbar.master.sink),
             ]
