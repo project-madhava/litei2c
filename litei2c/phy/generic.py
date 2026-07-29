@@ -71,6 +71,15 @@ class LiteI2CPHYCore(LiteXModule):
 
         nack = Signal()
 
+        # Elevating signals for hierarchical build
+        # self.scl_i = scl_i = pads.scl_i
+        self.scl_o = scl_o = pads.scl_o
+        self.scl_oe = scl_oe = pads.scl_oe
+
+        self.comb += [
+            scl_o.eq(clkgen.scl_o),
+            scl_oe.eq(clkgen.scl_oe),
+        ]
         # SDA
         if hasattr(pads, "sda_oe"):
             self.sda_o = sda_o = pads.sda_o
